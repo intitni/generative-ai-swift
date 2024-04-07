@@ -41,6 +41,9 @@ public final class GenerativeModel {
 
   /// Configuration parameters for sending requests to the backend.
   let requestOptions: RequestOptions
+    
+  /// Base URL
+  let baseURL: String?
 
   /// Initializes a new remote model with the given parameters.
   ///
@@ -59,6 +62,7 @@ public final class GenerativeModel {
                           safetySettings: [SafetySetting]? = nil,
                           tools: [Tool]? = nil,
                           toolConfig: ToolConfig? = nil,
+                          baseURL: String? = nil,
                           requestOptions: RequestOptions = RequestOptions()) {
     self.init(
       name: name,
@@ -68,6 +72,7 @@ public final class GenerativeModel {
       tools: tools,
       toolConfig: toolConfig,
       requestOptions: requestOptions,
+      baseURL: baseURL,
       urlSession: .shared
     )
   }
@@ -80,6 +85,7 @@ public final class GenerativeModel {
        tools: [Tool]? = nil,
        toolConfig: ToolConfig? = nil,
        requestOptions: RequestOptions = RequestOptions(),
+       baseURL: String? = nil,
        urlSession: URLSession) {
     modelResourceName = GenerativeModel.modelResourceName(name: name)
     generativeAIService = GenerativeAIService(apiKey: apiKey, urlSession: urlSession)
@@ -88,6 +94,7 @@ public final class GenerativeModel {
     self.tools = tools
     self.toolConfig = toolConfig
     self.requestOptions = requestOptions
+    self.baseURL = baseURL
 
     Logging.default.info("""
     [GoogleGenerativeAI] Model \(
@@ -135,6 +142,7 @@ public final class GenerativeModel {
                                                               tools: tools,
                                                               toolConfig: toolConfig,
                                                               isStreaming: false,
+                                                              baseURL: baseURL,
                                                               options: requestOptions)
       response = try await generativeAIService.loadRequest(request: generateContentRequest)
     } catch {
@@ -208,6 +216,7 @@ public final class GenerativeModel {
                                                         tools: tools,
                                                         toolConfig: toolConfig,
                                                         isStreaming: true,
+                                                        baseURL: baseURL,
                                                         options: requestOptions)
 
     var responseIterator = generativeAIService.loadRequestStream(request: generateContentRequest)
@@ -279,6 +288,7 @@ public final class GenerativeModel {
       let countTokensRequest = try CountTokensRequest(
         model: modelResourceName,
         contents: content(),
+        baseURL: baseURL,
         options: requestOptions
       )
       return try await generativeAIService.loadRequest(request: countTokensRequest)

@@ -18,6 +18,7 @@ import Foundation
 struct CountTokensRequest {
   let model: String
   let contents: [ModelContent]
+  let baseURL: String?
   let options: RequestOptions
 }
 
@@ -33,7 +34,7 @@ extension CountTokensRequest: GenerativeAIRequest {
   typealias Response = CountTokensResponse
 
   var url: URL {
-    URL(string: "\(GenerativeAISwift.baseURL)/\(options.apiVersion)/\(model):countTokens")!
+    URL(string: "\(baseURL ?? GenerativeAISwift.baseURL)/\(options.apiVersion)/\(model):countTokens")!
   }
 }
 
